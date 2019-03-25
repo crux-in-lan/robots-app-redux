@@ -6,56 +6,49 @@ import CardList from '../components/CardList';
 import Scrollable from '../components/Scrollable';
 import ErrorBondry from './ErrorBondry';
 import {connect} from 'react-redux';
-import {setSearchField} from '../redux/actions';
+import {setSearchField, setRobots} from '../redux/actions';
 
 const mapStateToProps = (state) => {
   return {
-    searchField: state.searchField
+    searchField: state.searchRobots.searchField,
+    isPending: state.requestRobots.isPending,
+    robots: state.requestRobots.robots,
+    error: state.requestRobots.error
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onSearchChange: (event) => dispatch(setSearchField(event.target.value))
+    onSearchChange: (event) => dispatch(setSearchField(event.target.value)),
+    onRobotRequest: () => dispatch(setRobots())
   }
 }
 
 class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      robots: []
-    }
-  }
-
-  // onSearchChange = (event) => {
-  //   this.setState({searchField: event.target.value});
-  // }
 
   componentDidMount = () => {
-    fetch('https://jsonplaceholder.typicode.com/users/')
-    .then(response => response.json())
-    .then(result => {
-      this.setState({robots: result});
-    })
-    .catch(err => alert('Unable to fetch robots from API')) 
+    this.props.onRobotRequest();
   }
 
   render() {
-    const filteredRobots = this.state.robots.filter(robot => {
+    const filteredRobots = this.props.robots.filter(robot => {
       return (robot.name.includes(this.props.searchField) ||
         robot.email.includes(this.props.searchField))
     });
-    return (
-      <div className="App">
-        <SearchBox onSearchChange={this.props.onSearchChange}/>
-        <Scrollable>
-         <ErrorBondry>
-            <CardList filteredRobots={filteredRobots}/>
-          </ErrorBondry>
-        </Scrollable>
-      </div>
-    );
+    if(this.props.isPending) {
+      return(<h1>Loading</h1>);
+    } else {
+      return (
+        <div className="App">
+          <SearchBox onSearchChange={this.props.onSearchChange}/>
+          <Scrollable>
+           <ErrorBondry>
+              <CardList filteredRobots={filteredRobots}/>
+            </ErrorBondry>
+          </Scrollable>
+        </div>
+      );
+    }
   }
 }
 
