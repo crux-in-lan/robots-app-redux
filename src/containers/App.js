@@ -5,20 +5,32 @@ import SearchBox from '../components/SearchBox';
 import CardList from '../components/CardList';
 import Scrollable from '../components/Scrollable';
 import ErrorBondry from './ErrorBondry';
+import {connect} from 'react-redux';
+import {setSearchField} from '../redux/actions';
 
+const mapStateToProps = (state) => {
+  return {
+    searchField: state.searchField
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onSearchChange: (event) => dispatch(setSearchField(event.target.value))
+  }
+}
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
-      searchField: '',
       robots: []
     }
   }
 
-  onSearchChange = (event) => {
-    this.setState({searchField: event.target.value});
-  }
+  // onSearchChange = (event) => {
+  //   this.setState({searchField: event.target.value});
+  // }
 
   componentDidMount = () => {
     fetch('https://jsonplaceholder.typicode.com/users/')
@@ -31,12 +43,12 @@ class App extends Component {
 
   render() {
     const filteredRobots = this.state.robots.filter(robot => {
-      return (robot.name.includes(this.state.searchField) ||
-        robot.email.includes(this.state.searchField))
+      return (robot.name.includes(this.props.searchField) ||
+        robot.email.includes(this.props.searchField))
     });
     return (
       <div className="App">
-        <SearchBox onSearchChange={this.onSearchChange}/>
+        <SearchBox onSearchChange={this.props.onSearchChange}/>
         <Scrollable>
          <ErrorBondry>
             <CardList filteredRobots={filteredRobots}/>
@@ -47,4 +59,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);
