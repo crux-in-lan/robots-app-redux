@@ -7,6 +7,7 @@ import Scrollable from '../components/Scrollable';
 import ErrorBondry from './ErrorBondry';
 import {connect} from 'react-redux';
 import {setSearchField, setRobots} from '../redux/actions';
+import Footer from '../components/footer';
 
 const mapStateToProps = (state) => {
   return {
@@ -46,6 +47,7 @@ class App extends Component {
               <CardList filteredRobots={filteredRobots}/>
             </ErrorBondry>
           </Scrollable>
+          <Footer/>
         </div>
       );
     }
